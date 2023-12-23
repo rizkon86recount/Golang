@@ -177,6 +177,7 @@ func main() {
 	}
 } */
 
+/*
 // Non-blocking Operations
 package main
 
@@ -204,5 +205,102 @@ func main() {
 		fmt.Println(msg)
 	default:
 		fmt.Println("Tidak ada pesan yang tersedia.")
+	}
+} */
+
+/*
+// channel - range dan close
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch := make(chan int)
+
+	// Goroutine untuk mengirim data ke channel
+	go func() {
+		for i := 1; i <= 5; i++ {
+			ch <- i
+		}
+		close(ch) // menutup channel setelah selesai mengirim data
+	}()
+
+	// Goroutine untuk membaca data dari channel
+	go func() {
+		for num := range ch {
+			fmt.Println(num)
+		}
+	}()
+
+	// Menunggu kedua goroutine selesai
+	// (biasanya lebih baik menggunakan WaitGroup untuk sinkronisasi)
+	time.Sleep(time.Second)
+	fmt.Println("Menunggu goroutine selesai...")
+}  */
+
+/*
+// Penerapan for – range – close Pada Channel
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	// Membuat channel dengan tipe int
+	ch := make(chan int)
+
+	// WaitGroup digunakan untuk menunggu goroutine selesai
+	var wg sync.WaitGroup
+
+	// Goroutine untuk mengirim data ke channel
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 1; i <= 20; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	// Goroutine untuk menerima data dari channel menggunakan for-range
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for num := range ch {
+			fmt.Println("Menerima data:", num)
+		}
+	}()
+
+	wg.Wait()
+}   */
+
+// Penggunaan timeout pada channel
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch := make(chan string)
+
+	// Goroutine untuk mengirim data ke channel setelah 2 detik
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch <- "Hello, World!"
+	}()
+
+	// Menunggu data dari channel dengan timeout 1 detik
+	select {
+	case msg := <-ch:
+		fmt.Println(msg)
+	case <-time.After(1 * time.Second):
+		fmt.Println("Timeout! Tidak ada data yang diterima dalam waktu yang ditentukan.")
 	}
 }
